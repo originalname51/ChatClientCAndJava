@@ -36,6 +36,28 @@ public void acceptConnection()
 		System.out.println("Critical Error. Accept Connection Failed");
 		e.printStackTrace();
 	}
+	System.out.println("We made it. Connected!!");
+	
+
+	try {
+		String output = in.readLine();
+		
+		System.out.println("we made it " + output);
+		String sendme = "ccc";
+		out.println(sendme);
+
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		System.out.println("failed!");
+		e.printStackTrace();
+	}
+	
+	
+	
+	
+	
+	
+	
 }
 
 
