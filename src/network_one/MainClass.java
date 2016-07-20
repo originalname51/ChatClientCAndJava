@@ -1,6 +1,5 @@
 package network_one;
 
-
 public class MainClass {
 	
 	/*
@@ -9,8 +8,8 @@ public class MainClass {
 	 * */
 
 	public static void main(String[] args) {
-		System.out.println("hello world");
-		System.out.println("hello there!");
+		ChatServer chatserver = new ChatServer(Integer.parseInt(args[0]));
+		chatserver.acceptConnection();
 	}
 
 }
