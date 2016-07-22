@@ -14,8 +14,7 @@ public class MainClass {
 		while(true)
 		{
 		chatserver.sendMessage();
-		chatserver.recieveMessage();	
-		chatserver.sendMessage();
+		chatserver.recieveMessage();
 		}
 	}
 

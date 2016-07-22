@@ -12,9 +12,8 @@ private	  ServerSocket chatServer;
 private         Socket client;
 private    PrintWriter out;
 private BufferedReader in;
-private final int    LENGTH = 5;
+private BufferedReader consoleMessage;
 private final int    MESSAGE_LENGTH = 500;
-//private DataOutputStream output;
 
 public	ChatServer(int portnumber)
 		{
@@ -30,10 +29,10 @@ public	ChatServer(int portnumber)
 public void acceptConnection()
 {
 	try {
-		this.client = this.chatServer.accept();
-		this.out	= new PrintWriter(this.client.getOutputStream(),true);
-//		this.output    = new DataOutputStream(this.client.getOutputStream());
-		this.in		= new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+		this.client 		= this.chatServer.accept();
+		this.out			= new PrintWriter(this.client.getOutputStream(),true);
+		this.in				= new BufferedReader(new InputStreamReader(this.client.getInputStream()));
+		this.consoleMessage = new BufferedReader(new InputStreamReader(System.in));
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		System.out.println("Critical Error. Accept Connection Failed");
@@ -41,42 +40,58 @@ public void acceptConnection()
 	}
 
 }
-
-public void sendMessage()
+//http://stackoverflow.com/questions/4644415/java-how-to-get-input-from-system-console
+public boolean sendMessage()
 {
-	String sendme = "Hello C Client, this is Java Server!!!!!!!!";
-	out.println(Integer.toString(sendme.length() +101));
-	out.flush();
-	out.println(sendme);
+	String sendme;
+	try {
+		sendme = consoleMessage.readLine();
+		out.println(Integer.toString(sendme.length() +101));
+		out.flush();
+		out.println(sendme);
+		return checkQuit(sendme);
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	return false;
 }
 
-public void recieveMessage()
+public boolean recieveMessage()
 {
 	String howLongMessageIs;
 	String outputMessage;
 	char [] message = new char[MESSAGE_LENGTH];
-	int number = 0;
-	
-		try {
-			howLongMessageIs = in.readLine();
-			number = Integer.parseInt(howLongMessageIs.trim());
+	int CharsToRead = 0;
+
+	try {
+	      howLongMessageIs = in.readLine();
+	      CharsToRead      = Integer.parseInt(howLongMessageIs.trim());
+	      CharsToRead     -= 100;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("FAILED IN RECIEVE MESSAGE");
 			e.printStackTrace();
-		}
-	number -= 100;			
+		}			
 	try {
-		if(in.read(message,0,number) == -1)
-			System.out.println("Critical Error. File not read correctly.");
+		if(in.read(message,0,CharsToRead) == -1)
+		System.out.println("Critical Error. File not read correctly.");
 		outputMessage = String.valueOf(message);
 		System.out.println(outputMessage);
+		
+		return checkQuit(outputMessage);
 		
 	} catch (IOException e) {
 		System.out.println("FAILED IN GETTING MESSAGE FROM SENDER! CRITICAL ERROR");
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
+	return false;
+}
+
+private boolean checkQuit(String check)
+{
+	return (check.trim().equals("\\quit")) ? true : false;	
 }
 	
 }
