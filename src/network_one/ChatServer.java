@@ -14,6 +14,7 @@ private    PrintWriter out;
 private BufferedReader in;
 private BufferedReader consoleMessage;
 private final int    MESSAGE_LENGTH = 500;
+private final int	 CHAR_OFFSET    = 100;
 
 public	ChatServer(int portnumber)
 		{
@@ -27,7 +28,7 @@ public	ChatServer(int portnumber)
 	}
 
 public void acceptConnection()
-{
+{		
 	try {
 		this.client 		= this.chatServer.accept();
 		this.out			= new PrintWriter(this.client.getOutputStream(),true);
@@ -46,14 +47,16 @@ public boolean sendMessage()
 	String sendme;
 	try {
 		sendme = consoleMessage.readLine();
-		out.println(Integer.toString(sendme.length() +101));
+		out.println(Integer.toString(sendme.length() +CHAR_OFFSET+1));
 		out.flush();
 		out.println(sendme);
-		return checkQuit(sendme);
+		return _checkQuit(sendme);
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
+		
 		e.printStackTrace();
 	}
+	
 	return false;
 }
 
@@ -67,19 +70,19 @@ public boolean recieveMessage()
 	try {
 	      howLongMessageIs = in.readLine();
 	      CharsToRead      = Integer.parseInt(howLongMessageIs.trim());
-	      CharsToRead     -= 100;
+	      CharsToRead     -= CHAR_OFFSET;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("FAILED IN RECIEVE MESSAGE");
 			e.printStackTrace();
 		}			
 	try {
-		if(in.read(message,0,CharsToRead) == -1)
-		System.out.println("Critical Error. File not read correctly.");
+		if(in.read(message,0,CharsToRead-1) == -1)
+			System.out.println("Critical Error. File not read correctly.");
 		outputMessage = String.valueOf(message);
-		System.out.println(outputMessage);
+		System.out.println(outputMessage.trim());
 		
-		return checkQuit(outputMessage);
+		return _checkQuit(outputMessage);
 		
 	} catch (IOException e) {
 		System.out.println("FAILED IN GETTING MESSAGE FROM SENDER! CRITICAL ERROR");
@@ -89,9 +92,20 @@ public boolean recieveMessage()
 	return false;
 }
 
-private boolean checkQuit(String check)
+private boolean _checkQuit(String check)
 {
-	return (check.trim().equals("\\quit")) ? true : false;	
+	return (check.trim().equals("\\quit")) ? false : true;	
+}
+public void shutDown()
+{
+	try {
+		this.in.close();
+		this.out.close();
+		this.client.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
 }
 	
 }
