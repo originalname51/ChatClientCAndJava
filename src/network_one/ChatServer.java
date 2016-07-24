@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -15,15 +16,18 @@ private BufferedReader in;
 private BufferedReader consoleMessage;
 private final int  	   MESSAGE_LENGTH = 500;
 private final int	   CHAR_OFFSET    = 100;
-
 /*
  * Chat Server Start Up - takes and starts the chat server.
  * Creates a reader for console messages.
+ * http://download.java.net/jdk7/archive/b123/docs/api/java/net/ServerSocket.html#ServerSocket(int, int, java.net.InetAddress)
+ * used for figuring out how to bind an IP address to a socket.
+ * http://www.java-samples.com/showtutorial.php?tutorialid=399 used for figuring out
+ * the InetAddress constructor. (It didn't have a default constructor or need one).
  * */
 public	ChatServer(int portnumber)
 		{
 		try {
-			this.chatServer = new ServerSocket(portnumber);
+			this.chatServer = new ServerSocket(portnumber,50,InetAddress.getLocalHost());
 			this.consoleMessage = new BufferedReader(new InputStreamReader(System.in));
 		} catch (IOException e) {
 			System.out.println("Critical Error. Socket Failed.");
@@ -65,13 +69,12 @@ public boolean sendMessage()
 		shutDown();
 		e.printStackTrace();
 	}
-	
 	return false;
 }
 /*
  * //http://stackoverflow.com/questions/8694984/remove-part-of-string
  * 
- * This will recieve a message. It first takes a newline character value from the client.
+ * This will receive a message. It first takes a newline character value from the client.
  * It will parse this as an integer value. It will then 
  * 
  * Protocol is client sends how long a message is, and then the message itself.
@@ -106,9 +109,9 @@ public boolean recieveMessage()
 		System.out.println("Critical Error. File not read correctly.");
 		outputMessage = String.valueOf(message);
 		System.out.print(outputMessage.trim());	//this will print instead of println to preserve all sent newlines.
-		System.out.print("\n");					//This will print a newline to seperate server send values.
+		System.out.print("\n");					//This will print a newline to separate server send values.
 
-		//The +2 here is because ">" = 1 and there is always a space after it, (2).
+		//The +2 here is because ">" = 1 and there is always a space after it, (so substring (index+2...)).
 		int index = outputMessage.indexOf(">");
 		String checker = outputMessage.substring(index+2, outputMessage.length());
 		return _checkQuit(checker);
